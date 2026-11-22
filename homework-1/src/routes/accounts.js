@@ -8,6 +8,10 @@ const router = express.Router();
 
 router.get('/:accountId/balance', (req, res) => {
   const { accountId } = req.params;
+  const details = validateAccountId(accountId);
+  if (details.length > 0) {
+    return res.status(400).json({ error: 'Validation failed', details });
+  }
   res.status(200).json({ accountId, balances: calculateBalance(accountId, findAll()) });
 });
 

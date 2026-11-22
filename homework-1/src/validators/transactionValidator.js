@@ -6,7 +6,9 @@ const CURRENCIES = new Set(Intl.supportedValuesOf('currency'));
 // "ACC-" prefix + exactly 5 alphanumeric characters
 const ACCOUNT_REGEX = /^ACC-[A-Za-z0-9]{5}$/;
 
-const isMissing = (v) => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
+const ACCOUNT_FORMAT_MESSAGE = 'Account must match format ACC-XXXXX (5 alphanumeric characters)';
+
+const isMissing =(v) => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
 
 // amount * 100 may be inexact in floating point (1.005 * 100 = 100.49999...),
 // so compare with the nearest integer using a small tolerance.
@@ -19,7 +21,7 @@ function validateAccount(details, field, value) {
   if (isMissing(value)) {
     details.push({ field, message: `${field} is required` });
   } else if (typeof value !== 'string' || !ACCOUNT_REGEX.test(value)) {
-    details.push({ field, message: 'Account must match format ACC-XXXXX (5 alphanumeric characters)' });
+    details.push({ field, message: ACCOUNT_FORMAT_MESSAGE });
   }
 }
 
@@ -76,7 +78,7 @@ function validateFilters(query) {
 
   if (accountId !== undefined && isSingle('accountId', accountId)) {
     if (ACCOUNT_REGEX.test(accountId)) filters.accountId = accountId;
-    else details.push({ field: 'accountId', message: 'Account must match format ACC-XXXXX (5 alphanumeric characters)' });
+    else details.push({ field: 'accountId', message: ACCOUNT_FORMAT_MESSAGE });
   }
 
   if (type !== undefined && isSingle('type', type)) {
