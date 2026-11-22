@@ -1,6 +1,7 @@
 const express = require('express');
 const { createTransaction, findAll, findById } = require('../models/transaction');
-const { validateTransaction } = require('../validators/transactionValidator');
+const { validateTransaction, validateFilters } = require('../validators/transactionValidator');
+const { filterTransactions } = require('../utils/filters');
 
 const router = express.Router();
 
@@ -13,7 +14,11 @@ router.post('/', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-  res.status(200).json(findAll());
+  const { details, filters } = validateFilters(req.query);
+  if (details.length > 0) {
+    return res.status(400).json({ error: 'Validation failed', details });
+  }
+  res.status(200).json(filterTransactions(findAll(), filters));
 });
 
 router.get('/:id', (req, res) => {
