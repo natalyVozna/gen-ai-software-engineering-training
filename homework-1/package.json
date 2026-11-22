@@ -1,0 +1,14 @@
+{
+  "name": "homework-1-banking-api",
+  "version": "1.0.0",
+  "description": "Simple banking transactions REST API (in-memory)",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
