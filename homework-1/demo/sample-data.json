@@ -1,0 +1,8 @@
+[
+  { "type": "deposit", "toAccount": "ACC-A1001", "amount": 1000, "currency": "USD" },
+  { "type": "deposit", "toAccount": "ACC-B2002", "amount": 500.5, "currency": "USD" },
+  { "type": "withdrawal", "fromAccount": "ACC-A1001", "amount": 200.25, "currency": "USD" },
+  { "type": "transfer", "fromAccount": "ACC-A1001", "toAccount": "ACC-B2002", "amount": 150, "currency": "USD" },
+  { "type": "deposit", "toAccount": "ACC-A1001", "amount": 300, "currency": "EUR" },
+  { "type": "withdrawal", "fromAccount": "ACC-B2002", "amount": 50, "currency": "EUR" }
+]

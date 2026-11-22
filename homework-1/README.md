@@ -202,6 +202,18 @@ The prompts were short because Claude Code reads `TASKS.md` and `CLAUDE.md` itse
   - **Left as is:** `console.log` (startup message) and `console.error` (500 handler) are not debug output. Error responses were already consistent (`{ error }` or `{ error, details }`). The sign rules shared by `calculateBalance` and `calculateSummary` stay duplicated — extracting them would rewrite working code for little gain. The now-redundant `src/.gitkeep` has since been removed.
 - **Verification:** Confirmed port 3456 was free, started the server by PID and ran a regression over all endpoints: `/health`, `POST /transactions` (three valid types, a request with several errors, broken JSON), `GET /transactions` with each filter, a combined filter, an empty result and invalid params, `GET /transactions/:id` (`200` and `404`), `/balance` and `/summary` for valid, empty and invalid accountIds, and an unknown route (`404`). All responses matched the previous behavior; `/balance` now returns `400` for invalid ids. Stopped the server by PID afterwards.
 
+### Docs & demo — HOWTORUN.md and `demo/`
+
+- **Request:** Extend `HOWTORUN.md` (running the app, testing guide, troubleshooting) without rewriting "Environment Setup", and create `demo/` with `run.sh`, `sample-requests.sh`, `sample-requests.http` and `sample-data.json`.
+- **AI proposal:** A plan in Plan mode. It noted that the API is in-memory and the server sets `timestamp`, so starting the server does not load `sample-data.json`. It also asked whether to add `"engines": { "node": ">=18" }` to `package.json` and recommended it. Nothing was added before I approved.
+- **My decisions / key implementation choices:**
+  - **`engines`:** approved, added `"engines": { "node": ">=18" }` to `package.json` (the only change there).
+  - **`sample-data.json` is really used:** `sample-requests.sh` first sends every transaction from the file with `POST /transactions`, then runs the other requests. The JSON is read with `node` (global `fetch`, Node 18+), so there is no `jq` and no new dependency. No separate `seed.sh`.
+  - **`run.sh`:** checks Node 18+, runs `npm install` only if `node_modules` is missing, checks that the port is free, and starts the server (`PORT` defaults to `3000`).
+  - **Busy port:** while verifying, the AI found that a busy port is not reported by the app: with Express 5 the listen error goes to the `app.listen` callback, so the app prints "listening" and exits with code `0`. I first kept `src/index.js` unchanged (`run.sh` checks the port itself), then asked the AI to fix it: `src/index.js` now handles the `app.listen` error, prints a clear message and exits with code `1`.
+  - **Demo-script design:** `BASE_URL` comes from the environment; the script covers success cases and `400` / `404` errors; the transaction `id` for `GET /transactions/:id` is taken from the seed output.
+- **Verification:** Port `3000` was in use by an unrelated process (a Next.js dev server), which I left alone, so everything ran on `PORT=3456` after confirming it was free. `run.sh` started the server and `sample-requests.sh` ran against it: seed `201` ×6, all success requests `200`/`201` (balance of `ACC-A1001`: `USD 649.75`, `EUR 300`), errors `400` and `404` as expected. `run.sh` refuses to start on a busy port (`3000` and `3456`, exit code `1`) and, with a fake Node 16 first in `PATH`, refuses on an old Node. The server was stopped by PID and the port was free afterwards. **Not verified:** `sample-requests.http` was not run in VS Code REST Client (only compared with the `.sh` script), and `run.sh` was not tried on a real Node < 18.
+
 ---
 
 ## 🧩 Challenges
@@ -218,6 +230,7 @@ The prompts were short because Claude Code reads `TASKS.md` and `CLAUDE.md` itse
 | Task 3 | The API sets `timestamp` itself, so the date-range edge cases (15:00 on the last day) cannot be created through curl. | Verified the edge cases by calling the validator and filter functions directly with crafted timestamps; the API-level checks used today's date (`from`/`to` equal to today, tomorrow and yesterday). |
 | Task 4 | Ambiguity about what "deposits" and "withdrawals" mean: counting only `type` deposit/withdrawal would ignore transfers and make the summary disagree with the balance. | Incoming transfers count as deposits and outgoing as withdrawals (same rules as `calculateBalance`); checked that `totalDeposits - totalWithdrawals` equals the balance per currency. |
 | Task 4 | A stale server from an earlier session was still running on port 3456 with old code, so the first curl run returned `Not found` for the new route (same issue as in Task 1). | Checked the process (`lsof`/`ps`: it was this project's own `node src/index.js`), stopped it by PID, restarted the server and repeated all checks; stopped my own server by PID afterwards. |
+| Docs & demo | A busy port was not reported: with Express 5 the `app.listen` error goes to the callback, so the app printed "listening" and exited with code `0`. Found while verifying `demo/run.sh`. | `src/index.js` now prints `Port N is already in use. Try PORT=3456 npm start` (or the error message for other errors) and exits with code `1`; API behavior is unchanged. |
 
 ---
 
