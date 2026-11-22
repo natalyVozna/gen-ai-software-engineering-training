@@ -1,7 +1,7 @@
 # 🏦 Homework 1: Banking Transactions API
 
 > **Student Name**: Natalia Nesterchuk
-> **Date Submitted**: [Date]
+> **Date Submitted**: 2026-11-22
 > **AI Tools Used**:
 > - **Claude Code** (Sonnet 5.5, Plan mode) — code implementation, curl verification, README updates.
 > - **Claude** (Opus 5.5, separate session) — mentor assistant: helped write the prompts for each task, review Claude Code's plans and reports, decide when to commit, and reminded me which screenshots to take.
@@ -245,12 +245,35 @@ The prompts were short because Claude Code reads `TASKS.md` and `CLAUDE.md` itse
 
 ## 📸 Screenshots
 
-> TODO: add 3–5 screenshots to `docs/screenshots/` and link them here.
+### 1. Task 1 — plan and my decisions
 
-- AI interaction (prompts and responses) — _to be added_
-- API running / curl requests — _to be added_
-- Test results — _to be added_
-- Interesting AI suggestions or corrections — _to be added_
+Claude Code's plan for Task 1 and my answers to its questions.
+
+![Claude Code's plan for Task 1 and my answers](docs/screenshots/01-ai-task1-plan-and-decisions.png)
+
+### 2. Task 2 — plan correction
+
+Reviewing the Task 2 plan: I asked to include the README and fix an inaccuracy.
+
+![Reviewing the Task 2 plan](docs/screenshots/02-ai-task2-plan-correction.png)
+
+### 3. Task 4 — prompt and plan
+
+The Task 4 prompt with open questions and the AI's reasoned answers.
+
+![Task 4 prompt and the AI's plan](docs/screenshots/03-ai-task4-prompt-and-plan.png)
+
+### 4. API running
+
+The server running on `PORT=3456`.
+
+![Server running on PORT=3456](docs/screenshots/04-api-running.png)
+
+### 5. Sample requests
+
+curl requests: create, list, balance and a `400` validation error.
+
+![curl requests: create, list, balance and a 400 error](docs/screenshots/05-sample-requests.png)
 
 ---
 
