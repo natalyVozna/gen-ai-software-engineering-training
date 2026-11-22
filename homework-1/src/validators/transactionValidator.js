@@ -104,4 +104,11 @@ function validateFilters(query) {
   return { details, filters };
 }
 
-module.exports = { validateTransaction, validateFilters };
+// Validates a standalone account id (e.g. a route param). Returns { field, message }[].
+function validateAccountId(value) {
+  const details = [];
+  validateAccount(details, 'accountId', value);
+  return details;
+}
+
+module.exports = { validateTransaction, validateFilters, validateAccountId };
