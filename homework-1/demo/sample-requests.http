@@ -1,0 +1,107 @@
+# Same requests as sample-requests.sh, for the VS Code "REST Client" extension
+# (humao.rest-client). Start the server first, then click "Send Request" above a request.
+# Change the port here if you use PORT=...
+@baseUrl = http://localhost:3000
+
+### Health check (200)
+GET {{baseUrl}}/health
+
+### Seed data - these 6 requests mirror demo/sample-data.json (201 each)
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{ "type": "deposit", "toAccount": "ACC-A1001", "amount": 1000, "currency": "USD" }
+
+###
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{ "type": "deposit", "toAccount": "ACC-B2002", "amount": 500.5, "currency": "USD" }
+
+###
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{ "type": "withdrawal", "fromAccount": "ACC-A1001", "amount": 200.25, "currency": "USD" }
+
+###
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{ "type": "transfer", "fromAccount": "ACC-A1001", "toAccount": "ACC-B2002", "amount": 150, "currency": "USD" }
+
+###
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{ "type": "deposit", "toAccount": "ACC-A1001", "amount": 300, "currency": "EUR" }
+
+###
+# @name createTx
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{ "type": "withdrawal", "fromAccount": "ACC-B2002", "amount": 50, "currency": "EUR" }
+
+### List all (200)
+GET {{baseUrl}}/transactions
+
+### Filters (200)
+GET {{baseUrl}}/transactions?accountId=ACC-A1001
+
+###
+GET {{baseUrl}}/transactions?type=transfer
+
+###
+GET {{baseUrl}}/transactions?from=2000-01-01&to=2100-01-01
+
+###
+GET {{baseUrl}}/transactions?accountId=ACC-A1001&type=deposit
+
+### No matches - empty list (200)
+GET {{baseUrl}}/transactions?from=2000-01-01&to=2000-01-02
+
+### Get by id (200) - uses the id of the request named "createTx" above
+@txId = {{createTx.response.body.id}}
+GET {{baseUrl}}/transactions/{{txId}}
+
+### Balance (200)
+GET {{baseUrl}}/accounts/ACC-A1001/balance
+
+### Summary (200)
+GET {{baseUrl}}/accounts/ACC-A1001/summary
+
+### Unused account - empty balances (200)
+GET {{baseUrl}}/accounts/ACC-Z9999/balance
+
+### ---------- Errors ----------
+
+### Several validation errors (400)
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{ "type": "transfer", "fromAccount": "BAD", "amount": -5.123, "currency": "XXX1" }
+
+### Broken JSON (400)
+POST {{baseUrl}}/transactions
+Content-Type: application/json
+
+{"type":
+
+### Invalid type filter (400)
+GET {{baseUrl}}/transactions?type=refund
+
+### Invalid date (400)
+GET {{baseUrl}}/transactions?from=2025-02-30
+
+### Invalid accountId (400)
+GET {{baseUrl}}/accounts/BAD/balance
+
+###
+GET {{baseUrl}}/accounts/BAD/summary
+
+### Unknown transaction id (404)
+GET {{baseUrl}}/transactions/does-not-exist
+
+### Unknown route (404)
+GET {{baseUrl}}/unknown
